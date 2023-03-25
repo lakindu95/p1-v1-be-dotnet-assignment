@@ -34,5 +34,10 @@ namespace Infrastructure.Repositores
         {
             return await _context.Airports.FirstOrDefaultAsync(o => o.Id == airportId);
         }
+
+		public async Task<Airport> GetAirportByDestinationAsync(string destination)
+        {
+            return await _context.Airports.AsNoTracking().FirstOrDefaultAsync(a => a.Name.ToLower().Contains(destination.ToLower()));
+        }
     }
 }

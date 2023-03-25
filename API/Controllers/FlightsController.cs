@@ -1,8 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using API.ApiRequests;
 using API.ApiResponses;
+using API.Application.Queries;
+using API.Dtos.Flights;
+using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace API.Controllers;
 
@@ -10,11 +17,35 @@ namespace API.Controllers;
 [Route("[controller]")]
 public class FlightsController : ControllerBase
 {
+	private readonly ILogger<FlightsController> _logger;
+	private readonly IMediator _mediator;
+	private readonly IMapper _mapper;
 
-    [HttpGet]
+	public FlightsController(
+			ILogger<FlightsController> logger,
+			IMediator mediator,
+			IMapper mapper)
+	{
+		_logger = logger;
+		_mediator = mediator;
+		_mapper = mapper;
+	}
+
+	[HttpGet]
     [Route("Search")]
-    public Task<IEnumerable<FlightResponse>> GetAvailableFlights()
+    public async Task<IEnumerable<FlightResponse>> GetAvailableFlights([FromQuery] string destination)
     {
-        throw new NotImplementedException();
-    }
+		SearchFlightsRequest query = new SearchFlightsRequest()
+		{
+			Destination = destination
+		};
+
+		List<SearchFlightResponseDto> availableFlights = await _mediator.Send(new GetFlightsByDestinationQuery()
+		{
+			SearchFlightsRequest = query
+        });
+
+		return _mapper.Map<IEnumerable<FlightResponse>>(availableFlights);
+
+	}
 }
