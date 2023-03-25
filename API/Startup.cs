@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MediatR;
+using Domain.Aggregates.OrderAggregate;
 
 namespace API
 {
@@ -42,6 +43,7 @@ namespace API
 
             services.AddScoped<IAirportRepository, AirportRepository>();
 			services.AddScoped<IFlightRepository, FlightRepository>();
+			services.AddScoped<IOrderRepository, OrderRepository>();
 
 		}
 

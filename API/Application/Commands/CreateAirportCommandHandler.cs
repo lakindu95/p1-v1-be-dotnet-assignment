@@ -19,7 +19,7 @@ namespace API.Application.Commands
             var airport = _airportRepository.Add(new Airport(request.Code, request.Name));
 
             await _airportRepository.UnitOfWork.SaveEntitiesAsync();
-            
+
             return airport;
         }
     }

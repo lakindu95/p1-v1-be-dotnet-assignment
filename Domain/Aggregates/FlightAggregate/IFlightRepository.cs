@@ -14,5 +14,6 @@ namespace Domain.Aggregates.FlightAggregate
         Task<Flight> GetAsync(Guid flightId);
 
 		Task<List<Flight>> GetAvailableFlightsByAirportIdAsync(Guid airportId);
+		Task<List<Flight>> GetFlightsWithRatesAsync(Guid flightId);
 	}
 }

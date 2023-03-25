@@ -37,14 +37,19 @@ namespace Infrastructure.Repositores
             return await _context.Flights.FirstOrDefaultAsync(o => o.Id == flightId);
         }
 
-        public async Task<List<Flight>> GetAvailableFlightsByAirportIdAsync(Guid airportId)
+		public async Task<List<Flight>> GetFlightsWithRatesAsync(Guid flightId)
+		{
+			return await _context.Flights.AsNoTracking()
+                        .Include(r => r.Rates)
+                        .Where(o => o.Id == flightId).ToListAsync();
+		}
+
+		public async Task<List<Flight>> GetAvailableFlightsByAirportIdAsync(Guid airportId)
         {
-            var test = await _context.Flights
+            return await _context.Flights.AsNoTracking()
                 .Include(r => r.Rates)
                 .Where(f => f.DestinationAirportId == airportId && f.Rates.Count > 0)
                 .ToListAsync();
-
-            return test;
         }
 	}
 

@@ -4,10 +4,16 @@ namespace API.Exceptions
 {
 	public class EmptySearchDestinationException : Exception
 	{
-		public EmptySearchDestinationException() : base()
+		public EmptySearchDestinationException()
 		{
-
 		}
 
+		public EmptySearchDestinationException(string message) : base(message)
+		{
+		}
+
+		public EmptySearchDestinationException(string message, Exception innerException) : base(message, innerException)
+		{
+		}
 	}
 }

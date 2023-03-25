@@ -1,22 +1,21 @@
-﻿using System;
-using API.ApiResponses;
-using API.Dtos.Flights;
+﻿using API.Application.ViewModels;
 using AutoMapper;
-using Microsoft.AspNetCore.Cors.Infrastructure;
+using Domain.Aggregates.OrderAggregate;
 
 namespace API.Mapping
 {
-    public class FlightsProfile : Profile
+    public class OrdersProfile : Profile
     {
-        public FlightsProfile()
+        public OrdersProfile()
         {
-            CreateMap<SearchFlightResponseDto, FlightResponse>()
-               .ForMember(dest => dest.DepartureAirportCode, opt => opt.MapFrom(src => src.DepartureAirportCode))
-               .ForMember(dest => dest.ArrivalAirportCode, opt => opt.MapFrom(src => src.ArrivalAirportCode))
-               .ForMember(dest => dest.Departure, opt => opt.MapFrom(src => src.Departure))
-               .ForMember(dest => dest.Arrival, opt => opt.MapFrom(src => src.Arrival))
-               .ForMember(dest => dest.PriceFrom, opt => opt.MapFrom(src => src.PriceFrom));
-        }
+            CreateMap<Order, OrderViewModel>()
+               .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+               .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+               .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
+               .ForMember(dest => dest.FlightId, opt => opt.MapFrom(src => src.FlightId))
+               .ForMember(dest => dest.FlightRateId, opt => opt.MapFrom(src => src.FlightRateId))
+			   .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+		}
     }
 }
 
