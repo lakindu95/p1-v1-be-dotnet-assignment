@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.SeedWork;
 
@@ -13,5 +12,6 @@ namespace Domain.Aggregates.OrderAggregate
 
         Task<Order> GetAsync(Guid orderId);
 
+        Task<Order> ConfirmOrder(Order order);
 	}
 }

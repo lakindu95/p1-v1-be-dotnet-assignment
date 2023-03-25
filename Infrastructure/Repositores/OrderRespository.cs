@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Domain.Aggregates.FlightAggregate;
 using Domain.Aggregates.OrderAggregate;
+using Domain.Common;
 using Domain.SeedWork;
+using Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositores
@@ -35,9 +39,22 @@ namespace Infrastructure.Repositores
 			return await _context.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
 		}
 
-		public async Task<Order> GetAirportByDestinationAsync(string destination)
+		public async Task<Order> ConfirmOrder(Order order)
 		{
-			return await _context.Orders.AsNoTracking().FirstOrDefaultAsync(a => a.Name.ToLower().Contains(destination.ToLower()));
+
+			var flightRate = await _context.FlightRates.FirstOrDefaultAsync(o => o.Id == order.FlightRateId);
+
+			var flight = await _context.Flights.FirstOrDefaultAsync(f => f.Rates.Any(r => r.Id == flightRate.Id));
+
+			flight.MutateRateAvailability(flightRate.Id, -order.NoOfSeats, order.Name);
+			_context.Flights.Update(flight);
+
+			//Order confirmation
+			order.Status = OrderStatus.Confirmed;
+			Update(order);
+
+			await UnitOfWork.SaveEntitiesAsync();
+			return order;
 		}
 	}
 }

@@ -47,13 +47,13 @@ namespace Domain.Aggregates.FlightAggregate
             AddDomainEvent(new FlightRatePriceChangedEvent(this, rate));
         }
 
-        public void MutateRateAvailability(Guid rateId, int mutation)
+        public void MutateRateAvailability(Guid rateId, int mutation, string name)
         {
             var rate = GetRate(rateId);
             
             rate.MutateAvailability(mutation);
             
-            AddDomainEvent(new FlightRateAvailabilityChangedEvent(this, rate, mutation));
+            AddDomainEvent(new FlightRateAvailabilityChangedEvent(this, rate, mutation, name));
         }
 
         private FlightRate GetRate(Guid rateId)
@@ -67,5 +67,5 @@ namespace Domain.Aggregates.FlightAggregate
 
             return rate;
         }
-    }
+	}
 }

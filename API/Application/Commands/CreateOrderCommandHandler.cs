@@ -34,9 +34,9 @@ namespace API.Application.Commands
 				{
 					throw new InvalidFlightException();
 				}
-				var selectedFlights = await _flightRepository.GetFlightsWithRatesAsync(flight.Id);
+				var selectedFlightsWithRates = await _flightRepository.GetFlightsWithRatesAsync(flight.Id);
 
-				var flightRate = selectedFlights.Select(f => f.Rates.FirstOrDefault(fr => fr.Id == request.FlightRateId)).FirstOrDefault();
+				var flightRate = selectedFlightsWithRates.Select(f => f.Rates.FirstOrDefault(fr => fr.Id == request.FlightRateId)).FirstOrDefault();
 
 				if (flightRate == null)
 				{

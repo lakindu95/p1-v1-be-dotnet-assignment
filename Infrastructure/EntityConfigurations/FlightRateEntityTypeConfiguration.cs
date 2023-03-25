@@ -15,7 +15,7 @@ namespace Infrastructure.EntityConfigurations
             builder.Property("Name").IsRequired();
             builder.Property("Available").IsRequired();
 
-            builder.OwnsOne(o => o.Price, a =>
+			builder.OwnsOne(o => o.Price, a =>
             {
                 a.Property<Guid>("FlightRateId");
                 a.WithOwner();
