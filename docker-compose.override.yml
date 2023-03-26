@@ -7,3 +7,7 @@ services:
       POSTGRES_DBNAME: development
     ports:
       - "5432:5432"
+  acme-api:
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro

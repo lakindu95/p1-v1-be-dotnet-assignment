@@ -58,6 +58,6 @@ We like to use some modern best practices in this assignment and try to point yo
 - https://docs.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/
 
 ## To Do List
-- Dockerizing the entire project
+- Dockerizing the entire project - Done
 - Adding unit tests and test coverage
 - Pagination for GET requests like lists with Meta tags
