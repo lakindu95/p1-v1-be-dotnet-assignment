@@ -25,8 +25,13 @@ namespace API.Controllers
             _mediator = mediator;
             _mapper = mapper;
         }
-        
-        [HttpPost]
+
+		/// <summary>
+		/// Store airport
+		/// </summary>
+		/// <param name="command"></param>
+		/// <returns>Returns created airport</returns>
+		[HttpPost]
         public async Task<IActionResult> Store([FromBody]CreateAirportCommand command)
         {
             var airport = await _mediator.Send(command);

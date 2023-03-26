@@ -28,6 +28,11 @@ namespace API.Controllers
 			_mapper = mapper;
 		}
 
+		/// <summary>
+		/// Creates order
+		/// </summary>
+		/// <param name="command"></param>
+		/// <returns>Returns summary of created pending order</returns>
 		[HttpPost]
 		[Route("Order")]
 		public async Task<IActionResult> CreateOrder([FromBody] CreateOrderCommand command)
@@ -43,6 +48,11 @@ namespace API.Controllers
 				_logger.LogError(ex, $"CreateOrder: Number of seats must be more than 0.");
 				return new JsonErrorResult(new { message = $"Invalid Order. Number of seats must be more than 0." }, HttpStatusCode.BadRequest);
 
+			}
+			catch (InvalidEmailException ex)
+			{
+				_logger.LogError(ex, $"CreateOrder: Invalid Email provided. Email: {command.Email}");
+				return new JsonErrorResult(new { message = $"Invalid email provided. Email: {command.Email}" }, HttpStatusCode.BadRequest);
 			}
 			catch (NoSeatsAvailableException ex)
 			{
@@ -72,6 +82,11 @@ namespace API.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Confirm order
+		/// </summary>
+		/// <param name="command"></param>
+		/// <returns>Returns summary of confirmed order</returns>
 		[HttpPut]
 		[Route("Confirm")]
 		public async Task<IActionResult> ConfirmOrder([FromBody] ConfirmOrderCommand command)

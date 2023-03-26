@@ -32,6 +32,12 @@ namespace API.Application.Commands
 				throw new InvalidNumberOfSeatsException();
 			}
 
+			//Check if email is valid
+			if (!IsValidEmail(request.Email))
+			{
+				throw new InvalidEmailException();
+			}
+
 			var flight = await _flightRepository.GetAsync(request.FlightId);
 
 			//Check if the entered flight is valid
@@ -77,6 +83,25 @@ namespace API.Application.Commands
 			_logger.LogInformation($"CreateOrderCommandHandler: Successfully added Order {request.FlightId}");
 
 			return order;
+		}
+
+		bool IsValidEmail(string email)
+		{
+			var trimmedEmail = email.Trim();
+
+			if (trimmedEmail.EndsWith("."))
+			{
+				return false;
+			}
+			try
+			{
+				var addr = new System.Net.Mail.MailAddress(email);
+				return addr.Address == trimmedEmail;
+			}
+			catch
+			{
+				return false;
+			}
 		}
 	}
 }

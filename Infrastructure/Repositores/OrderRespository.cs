@@ -39,13 +39,8 @@ namespace Infrastructure.Repositores
 
 		public async Task<Order> ConfirmOrder(Order order)
 		{
-
-			var flightRate = await _context.FlightRates.FirstOrDefaultAsync(o => o.Id == order.FlightRateId);
-
-			var flight = await _context.Flights.FirstOrDefaultAsync(f => f.Rates.Any(r => r.Id == flightRate.Id));
-
-			flight.MutateRateAvailability(flightRate.Id, -order.NoOfSeats, order.Name);
-			_context.Flights.Update(flight);
+			//Reduce seats availability
+			await MutateSeatsAvailablity(order.Name, order.FlightRateId, order.NoOfSeats);
 
 			//Order confirmation
 			order.Status = OrderStatusEnum.Confirmed;
@@ -55,6 +50,16 @@ namespace Infrastructure.Repositores
 
 			await UnitOfWork.SaveEntitiesAsync();
 			return order;
+		}
+
+		private async Task MutateSeatsAvailablity(string name, Guid flightRateId, int seats)
+		{
+			var flightRate = await _context.FlightRates.FirstOrDefaultAsync(o => o.Id == flightRateId);
+
+			var flight = await _context.Flights.FirstOrDefaultAsync(f => f.Rates.Any(r => r.Id == flightRate.Id));
+
+			flight.MutateRateAvailability(flightRate.Id, -seats, name);
+			_context.Flights.Update(flight);
 		}
 	}
 }

@@ -32,6 +32,11 @@ public class FlightsController : ControllerBase
 		_mapper = mapper;
 	}
 
+	/// <summary>
+	/// Retrieve available flights by destination
+	/// </summary>
+	/// <param name="destination"></param>
+	/// <returns>Returns flight details based on destination</returns>
 	[HttpGet]
     [Route("Search")]
     public async Task<IEnumerable<FlightResponse>> GetAvailableFlights([FromQuery] string destination)
