@@ -6,6 +6,7 @@ using API.ApiRequests;
 using API.ApiResponses;
 using API.Application.Queries;
 using API.Dtos.Flights;
+using API.Exceptions;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -35,17 +36,34 @@ public class FlightsController : ControllerBase
     [Route("Search")]
     public async Task<IEnumerable<FlightResponse>> GetAvailableFlights([FromQuery] string destination)
     {
-		SearchFlightsRequest query = new SearchFlightsRequest()
+		try
 		{
-			Destination = destination
-		};
+			SearchFlightsRequest query = new SearchFlightsRequest()
+			{
+				Destination = destination
+			};
 
-		List<SearchFlightResponseDto> availableFlights = await _mediator.Send(new GetFlightsByDestinationQuery()
+			List<SearchFlightResponseDto> availableFlights = await _mediator.Send(new GetFlightsByDestinationQuery()
+			{
+				SearchFlightsRequest = query
+			});
+			return _mapper.Map<IEnumerable<FlightResponse>>(availableFlights);
+
+		}
+		catch (EmptySearchDestinationException ex)
 		{
-			SearchFlightsRequest = query
-        });
-
-		return _mapper.Map<IEnumerable<FlightResponse>>(availableFlights);
-
+			_logger.LogError(ex, $"GetAvailableFlights: Empty destination.");
+			return Enumerable.Empty<FlightResponse>();
+		}
+		catch (NoAirportExistsException ex)
+		{
+			_logger.LogError(ex, $"GetAvailableFlights: No airports available. Destination: {destination}");
+			return Enumerable.Empty<FlightResponse>();
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError(ex, $"GetAvailableFlights: Internal error occured.");
+			throw new Exception();
+		}
 	}
 }

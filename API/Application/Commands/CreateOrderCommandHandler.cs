@@ -26,58 +26,57 @@ namespace API.Application.Commands
 
 		async Task<Order> IRequestHandler<CreateOrderCommand, Order>.Handle(CreateOrderCommand request, CancellationToken cancellationToken)
 		{
-			try
+			//Check for number of seats are 0 or less than zero
+			if (request.NoOfSeats <= 0)
 			{
-				var flight = await _flightRepository.GetAsync(request.FlightId);
-
-				if (flight == null)
-				{
-					throw new InvalidFlightException();
-				}
-				var selectedFlightsWithRates = await _flightRepository.GetFlightsWithRatesAsync(flight.Id);
-
-				var flightRate = selectedFlightsWithRates.Select(f => f.Rates.FirstOrDefault(fr => fr.Id == request.FlightRateId)).FirstOrDefault();
-
-				if (flightRate == null)
-				{
-					throw new InvalidFlightRateException();
-				}
-
-				Price price = new Price(flightRate.Price.Value * request.NoOfSeats, flightRate.Price.Currency);
-
-				var order = _orderRepository.Add(new Order
-				{
-					Name = request.Name,
-					Email = request.Email,
-					FlightId = request.FlightId,
-					FlightRateId = request.FlightRateId,
-					NoOfSeats = request.NoOfSeats,
-					Price = price.Value,
-					Currency = price.Currency,
-					Status = OrderStatus.Pending
-				});
-
-				await _orderRepository.UnitOfWork.SaveEntitiesAsync();
-				_logger.LogInformation($"CreateOrderCommandHandler: Successfully added Order {request.FlightId}");
-
-				return order;
+				throw new InvalidNumberOfSeatsException();
 			}
-			//TODO Exception handling
-			catch (InvalidFlightException ex)
+
+			var flight = await _flightRepository.GetAsync(request.FlightId);
+
+			//Check if the entered flight is valid
+			if (flight == null)
 			{
-				_logger.LogError(ex, $"CreateOrderCommandHandler: Invalid Flight ID {request.FlightId}");
-				return null;
+				throw new InvalidFlightException();
 			}
-			catch (InvalidFlightRateException ex)
+			var selectedFlightsWithRates = await _flightRepository.GetFlightsWithRatesAsync(flight.Id);
+
+			var flightRate = selectedFlightsWithRates.Select(f => f.Rates.FirstOrDefault(fr => fr.Id == request.FlightRateId)).FirstOrDefault();
+
+			//Check if the entered flight rate is valid
+			if (flightRate == null)
 			{
-				_logger.LogError(ex, $"CreateOrderCommandHandler: Invalid Flight Rate ID {request.FlightRateId}");
-				return null;
+				throw new InvalidFlightRateException();
 			}
-			catch (Exception ex)
+
+			//Check availability before order
+			var availableSeatCount = flightRate.Available - request.NoOfSeats;
+			if (availableSeatCount <= 0)
 			{
-				_logger.LogCritical(ex, $"CreateOrderCommandHandler: General Exception");
-				return null;
+				throw new NoSeatsAvailableException();
 			}
+
+			Price price = new Price(flightRate.Price.Value * request.NoOfSeats, flightRate.Price.Currency);
+
+			var order = _orderRepository.Add(new Order
+			{
+				Name = request.Name,
+				Email = request.Email,
+				FlightId = request.FlightId,
+				FlightRateId = request.FlightRateId,
+				NoOfSeats = request.NoOfSeats,
+				Price = price.Value,
+				Currency = price.Currency,
+				Status = OrderStatusEnum.Pending,
+				CreatedDate = DateTimeOffset.UtcNow,
+				UpdatedDate = DateTimeOffset.UtcNow
+			});
+
+			await _orderRepository.UnitOfWork.SaveEntitiesAsync();
+
+			_logger.LogInformation($"CreateOrderCommandHandler: Successfully added Order {request.FlightId}");
+
+			return order;
 		}
 	}
 }

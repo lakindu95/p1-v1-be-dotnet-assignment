@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using System.Threading;
 using Domain.Aggregates.FlightAggregate;
@@ -8,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using API.Exceptions;
 using Domain.Common;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Application.Commands
 {
@@ -27,57 +25,39 @@ namespace API.Application.Commands
 
 		async Task<Order> IRequestHandler<ConfirmOrderCommand, Order>.Handle(ConfirmOrderCommand request, CancellationToken cancellationToken)
 		{
-			try
+			var order = await _orderRepository.GetAsync(request.Id);
+
+			//Check if order is valid
+			if (order == null)
 			{
-				var order = await _orderRepository.GetAsync(request.Id);
-
-				if (order == null)
-				{
-					throw new OrderNotFoundException();
-				}
-
-				if (order.Status == OrderStatus.Confirmed)
-				{
-					throw new OrderAlreadyConfirmedException();
-				}
-
-				//Check availability before mutation
-				var flightsWithRates = await _flightRepository.GetFlightsWithRatesAsync(order.FlightId);
-				var flightRate = flightsWithRates.Select(f => f.Rates.FirstOrDefault(fr => fr.Id == order.FlightRateId)).FirstOrDefault();
-
-				var availableSeatCount = flightRate.Available - order.NoOfSeats;
-
-				if (availableSeatCount <= 0)
-				{
-					throw new NoSeatsAvailableException();
-				}
-
-				var confirmOrder = await _orderRepository.ConfirmOrder(order);
-
-				await _flightRepository.UnitOfWork.SaveEntitiesAsync();
-				await _orderRepository.UnitOfWork.SaveEntitiesAsync();
-
-				_logger.LogInformation($"ConfirmOrderCommandHandler: Successfully confirmed Order {request.Id}");
-
-				return confirmOrder;
+				throw new OrderNotFoundException();
 			}
-			//TODO: Exceptions
-			catch (NoSeatsAvailableException ex)
+
+			//Check if the order is already confirmed
+			if (order.Status == OrderStatusEnum.Confirmed)
 			{
-				return null;
+				throw new OrderAlreadyConfirmedException();
 			}
-			catch (OrderAlreadyConfirmedException ex)
+
+			//Check availability before mutation
+			var flightsWithRates = await _flightRepository.GetFlightsWithRatesAsync(order.FlightId);
+			var flightRate = flightsWithRates.Select(f => f.Rates.FirstOrDefault(fr => fr.Id == order.FlightRateId)).FirstOrDefault();
+
+			var availableSeatCount = flightRate.Available - order.NoOfSeats;
+
+			if (availableSeatCount <= 0)
 			{
-				return null;
+				throw new NoSeatsAvailableException();
 			}
-			catch (OrderNotFoundException ex)
-			{
-				return null;
-			}
-			catch (Exception ex)
-			{
-				return null;
-			}
+
+			var confirmOrder = await _orderRepository.ConfirmOrder(order);
+
+			await _flightRepository.UnitOfWork.SaveEntitiesAsync();
+			await _orderRepository.UnitOfWork.SaveEntitiesAsync();
+
+			_logger.LogInformation($"ConfirmOrderCommandHandler: Successfully confirmed Order {request.Id}");
+
+			return confirmOrder;
 		}
 	}
 }

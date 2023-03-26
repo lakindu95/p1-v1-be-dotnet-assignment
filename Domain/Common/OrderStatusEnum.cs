@@ -1,6 +1,6 @@
 ﻿namespace Domain.Common
 {
-	public enum OrderStatus
+	public enum OrderStatusEnum
 	{
 		Pending = 1,
 		Confirmed = 2

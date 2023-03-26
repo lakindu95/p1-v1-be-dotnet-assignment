@@ -50,7 +50,9 @@ namespace Infrastructure.Repositores
 			_context.Flights.Update(flight);
 
 			//Order confirmation
-			order.Status = OrderStatus.Confirmed;
+			order.Status = OrderStatusEnum.Confirmed;
+			order.UpdatedDate = DateTimeOffset.UtcNow;
+
 			Update(order);
 
 			await UnitOfWork.SaveEntitiesAsync();
