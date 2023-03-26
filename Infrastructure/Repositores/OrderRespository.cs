@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Aggregates.FlightAggregate;
 using Domain.Aggregates.OrderAggregate;
 using Domain.Common;
 using Domain.SeedWork;
-using Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositores
