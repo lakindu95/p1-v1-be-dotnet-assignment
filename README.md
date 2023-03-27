@@ -1,63 +1,196 @@
-# AcmeFlights Assignment
+<h1 align="center">
+  <img src="./acmelogo.png">
+</h1>
 
-![alt text](/acmeflights-image.jpg)
+<h4 align="center">
+A simple flight booking system for .NET
+</h4>
 
-This repository is the starting point for our .NET assignment. You are going to create a flights booking engine. API clients should be able to search available flights and book them. **The purpose of the assignment is to see if there is a match between our problem solving and coding style**
+<p align="center">
+ <a href="https://github.com/lakindu95/p1-v1-be-dotnet-assignment"><img src="https://img.shields.io/badge/ACME-Flights-informational.svg"></a>
+ <a><img src="https://img.shields.io/badge/.NET-6-brightgreen.svg"></a>
+<img alt="GitHub forks" src="https://img.shields.io/github/forks/lakindu95/p1-v1-be-dotnet-assignment?style=social">
+ <a href="https://saythanks.io/to/lakindu95"><img src="https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg"></a>
+</p>
 
-We like to use some modern best practices in this assignment and try to point you in a certain direction. But don't take it too strictly. If you are struggling with something, just let it go and shine at the parts you are more familiar with. We are not expecting everyone to know everything ;) The same is true the other way around. When you think there's a more clever solution, just do it and argue why it's better.
+Welcome to ACME Flights flights booking engine. This application is written in .NET 6. Feel free to contribute and maintain the codebase. 
 
-## Excercise "requirements"
-
-- Implement the following features:
-    - **Feature 1**: Search the available flights for a destination
-        - You can search available flights to a specific destination
-        - Does not include flights that are not available (has no rates)
-        - For each found flight show:
-          - Departure airport code
-          - Arrival airport code
-          - Departure datetime
-          - Arrival datetime
-          - Lowest Price
-    - **Feature 2**: Placing an order
-        - Must have endpoints to create an order
-        - Must use the Ordering domain (`Domain/Aggregates/OrderAggregate/`)
-        - Must be able to fill the order with the (just the necessary) details, while still in draft state
-        - Respects the business logic
-    - **Feature 3**: Confirming an order
-        - Must be able to confirm the order
-        - When an order is confirmed, the any ordered rates should lower their availability by the quantity ordered
-        - Notifies the customer about the confirmed order (fake the notification with a `Console.WriteLine`)
-        - Its not possible to make changes to a confirmed order (guarded by domain)
-- **Architecture requirements**: Apply the following practices throughout the project
-    - Domain Driven Design
-    - CQRS
-    - Mediator pattern (Using [MediatR](https://github.com/jbogard/MediatR))
-    - Persistence ignorance
-    - SOLID
-- **Other**
-    - The project must be runnable on MacOS and Windows
-    - If there are additional steps for us to take to run it, please write them down
-
-> **Do not worry** if you are not familiar, or are struggling with one or more of the requirements. Just do the best you can. Not being able to fulfill all requirements does not mean you "failed".
-> 
-> This assignment is intended to be a conversation starter. We would still love to see your solution, even if you were not able to fulfill all requirements! We will discuss the assignment afterwards, so there's always the opportunity to explain the decisions made
+## 🚀 Install
 
 ## Prerequisities
 
 - Docker Desktop
 - .NET 6 SDK
+- Visual Studio
 
-## Getting started
+# 📚 Overview
+
+_ACMEFlights_ spins up the following APIs currently. Also you can check the swagger documentation to try out the APIs once spins up. 
+
+* **[Airports](https://github.com/lakindu95/p1-v1-be-dotnet-assignment#airports)**
+
+* **[Flights](https://github.com/lakindu95/p1-v1-be-dotnet-assignment#flights)**
+
+* **[Order](https://github.com/lakindu95/p1-v1-be-dotnet-assignment#order)**
+
+**Note** - You can use the swagger documentation once the API is spin up to explore the latest changes to the API.
+```
+https://_yoururl_/swagger/index.html
+```
+
+## 📝 Getting started
 
 - Start the Postgres database with `docker-compose up -d` (the application is already configured properly, but if you want to connect to the db directly you can see the credentials in the `docker-compose.yml` file)
 - You can now run the API project and everything should work. Upon start the application will run the migrations and seed data to the database.
 
-## References 
+### Run from CLI 
 
-- https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/
-- https://docs.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/
+To run it from CLI, you should install dotnet CLI to your local machine
+```
+dotnet run --project ./API/API.csproj
 
-## To Do List
-- Dockerizing the entire project - Done
+To Exit
+Ctrl + C
+```
+
+### Run from Visual Studio
+
+```
+1. Load the solution file sln
+2. Build the project in Visual studio
+3. Make sure the database is running on the docker as above step
+4. Select the **API** as the start up project
+5. Run the project (first time when running the project, a migration script will run and create the data needed)
+
+Enjoy!
+```
+
+## 📝 APIs 
+
+### Airports
+
+<hr>
+
+- Register Airports
+    - The API will register the airports and make sure that the code has atleast 3 characters to register.
+
+**Request**
+```
+POST /Airports
+{
+  "code": "string",
+  "name": "string"
+}
+```
+
+**Response**
+```
+POST /Airports
+{
+  "id": "Guid"
+  "code": "string",
+  "name": "string"
+}
+```
+
+### Flights
+
+<hr>
+
+- Search for flights by destination
+    - The API will search the available flights based on the destination and return the details.
+
+**Request**
+```
+GET /Flights/Search?destination="abc"
+```
+
+**Response**
+```
+[
+  {
+    "departureAirportCode": "Guid",
+    "arrivalAirportCode": "Guid",
+    "departure": "2021-08-01T07:55:00+05:30",
+    "arrival": "2021-08-01T10:55:00+05:30",
+    "priceFrom": 14233
+  },
+  {
+    "departureAirportCode": "Guid",
+    "arrivalAirportCode": "Guid",
+    "departure": "2022-11-02T03:27:00+05:30",
+    "arrival": "2022-11-02T15:27:00+05:30",
+    "priceFrom": 10371
+  } ...
+]
+```
+
+### Order
+
+<hr>
+
+- Create a new order
+    - Customers can book the flights by creating the order. Flight ID and Flight Rate ID is required. Number of seats must be more than 0.
+
+**Request**
+```
+POST /Order
+{
+  "name": "string",
+  "email": "string",
+  "flightId": "string",
+  "flightRateId": "string",
+  "noOfSeats": int
+}
+```
+
+**Response**
+```
+{
+  "orderId": "Guid",
+  "name": "test",
+  "email": "test@gmail.com",
+  "flightId": "Guid",
+  "flightRateId": "Guid",
+  "noOfSeats": 1,
+  "price": 14254,
+  "status": "Pending",
+  "createdDate": "2023-03-27T12:27:41.3171033+00:00",
+  "updatedDate": "2023-03-27T12:27:41.3171141+00:00"
+}
+```
+
+<hr>
+
+- Confirm the created order Id
+    - Once the Order is placed, it will stay as a pending order until this API is run to confirm the order. 
+
+**Request**
+```
+PUT /Confirm
+{
+  "id": "string"
+}
+```
+
+**Response**
+```
+{
+  "orderId": "Guid",
+  "name": "test",
+  "email": "test@gmail.com",
+  "flightId": "Guid",
+  "flightRateId": "Guid",
+  "noOfSeats": 1,
+  "price": 14254,
+  "status": "Confirmed",
+  "createdDate": "2023-03-27T12:27:41.3171033+00:00",
+  "updatedDate": "2023-03-27T12:29:50.3171141+00:00"
+}
+```
+
+## 📝 To Do List
+- Dockerizing the entire project with HTTPS
 - Adding unit tests and test coverage
 - Pagination for GET requests like lists with Meta tags
+- Authentication flow

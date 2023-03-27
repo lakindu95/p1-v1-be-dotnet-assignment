@@ -10,7 +10,10 @@ namespace API.EventNotification
 	{
 		public Task Handle(FlightRateAvailabilityChangedEvent notification, CancellationToken cancellationToken)
 		{
-			Console.WriteLine($"Notification: Thank You! Your order has been succesfully confirmed. Order details: Name: {notification.Name}, Flight: {notification.Flight.Id}. No of seats {notification.Mutation}");
+			//Convert mutation to positive number 
+			int numberOfSeats = notification.Mutation * -1;
+
+			Console.WriteLine($"Notification: Thank You! Your order has been succesfully confirmed. Order details: Name: {notification.Name}, Flight: {notification.Flight.Id}. No of seats {numberOfSeats}");
 			return Task.CompletedTask;
 		}
 	}
